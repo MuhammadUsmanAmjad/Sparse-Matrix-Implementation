@@ -1,0 +1,226 @@
+#include <iostream>
+using namespace std;
+template <typename T>
+struct node
+{
+    T data;
+    node<T> *next;
+    node<T>()
+    {
+        this->next = NULL;
+    }
+    node<T>(T data)
+    {
+        this->next = NULL;
+        this->data = data;
+    }
+    template <typename U>
+    friend class linklist;
+};
+template <typename T>
+class linklist
+{
+public:
+    node<T> *head;
+    linklist<T>()
+    {
+        this->head = NULL;
+    }
+
+    // 1
+
+    void insert(T data)
+    {
+        node<T> *insert_node = new node<T>(data);
+        if (this->head == NULL)
+        {
+            this->head = insert_node;
+            cout << "head is NULL so inserted at 1 idx.\n";
+            return;
+        }
+        else if (this->head->next == NULL)
+        {
+            insert_node->next = this->head;
+            this->head = insert_node;
+            cout << "As linklist<T> has only one node<T> so inserted at its back.\n";
+            return;
+        }
+        node<T> *temp = this->head;
+        while (temp->next->next != NULL)
+        {
+            temp = temp->next;
+        }
+        node<T> *add_node = temp->next;
+        temp->next = insert_node;
+        insert_node->next = add_node;
+    }
+    void print()
+    {
+        node<T> *temp = this->head;
+        while (temp != NULL)
+        {
+            cout << temp->data << "->";
+            temp = temp->next;
+        }
+        cout << "NULL" << endl;
+    }
+
+    // 2
+    void delete_node()
+    {
+        if (this->head == NULL)
+        {
+            cout << "list is Empty\n";
+            return;
+        }
+        if (this->head->next == NULL)
+        {
+            cout << "there is only one node<T>\n";
+            return;
+        }
+        node<T> *temp = this->head->next;
+        head->next = head->next->next;
+        delete temp;
+    }
+
+    void insert_at_back(T data)
+    {
+        node<T> *add_node = new node<T>(data);
+        if (this->head == NULL)
+        {
+            this->head = add_node;
+            return;
+        }
+        if (this->head->next == NULL)
+        {
+            this->head->next = add_node;
+            return;
+        }
+        node<T> *temp = this->head;
+        while (temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+        temp->next = add_node;
+    }
+    bool is_search(T val)
+    {
+        node<T> *temp = this->head;
+        if (temp == NULL)
+            return false;
+        while (temp != NULL)
+        {
+            if (temp->data == val)
+                return true;
+            temp = temp->next;
+        }
+        return false;
+    }
+    // 3
+    linklist<T> *merge(linklist<T> *l)
+    {
+        node<T> *temp1 = this->head;
+        node<T> *temp2 = l->head;
+        linklist<T> *merge_list = new linklist<T>;
+        while (temp1 != NULL)
+        {
+            merge_list->insert_at_back(temp1->data);
+            temp1 = temp1->next;
+        }
+        while (temp2 != NULL)
+        {
+            if (!(merge_list->is_search(temp2->data)))
+            {
+                merge_list->insert_at_back(temp2->data);
+            }
+            temp2 = temp2->next;
+        }
+        return merge_list;
+    }
+    ~linklist<T>()
+    {
+        while (head != NULL)
+        {
+            node<T> *temp = head;
+            head = head->next;
+            delete temp;
+        }
+        // cout << "~linklist<T>() called\n";
+    }
+
+    // 4
+    void comprees()
+    {
+        if (this->head == NULL)
+            return;
+        linklist<T> *compressed = new linklist<T>;
+        node<T> *temp = this->head;
+        while (temp != NULL)
+        {
+            if (!(compressed->is_search(temp->data)))
+                compressed->insert_at_back(temp->data);
+            temp = temp->next;
+        }
+
+        while (this->head != NULL)
+        {
+            node<T> *temp1 = this->head;
+            this->head = this->head->next;
+            delete temp1;
+        }
+
+        temp = compressed->head;
+        while (temp != NULL)
+        {
+            this->insert_at_back(temp->data);
+            temp = temp->next;
+        }
+        delete compressed;
+    }
+};
+int main()
+{
+    // 1 & 2
+    linklist<int> *l = new linklist<int>;
+    l->insert(1);
+    l->insert(2);
+    l->insert(3);
+    l->insert(4);
+    l->print();
+    l->delete_node();
+    cout << "After 2nd node deleted\n";
+    l->print();
+
+    // 3
+    linklist<int> *l1 = new linklist<int>;
+    linklist<int> *l2 = new linklist<int>;
+    for (int i = 0; i < 10; i++)
+        l1->insert_at_back(i);
+    for (int i = 0; i < 10; i++)
+        l2->insert_at_back(i + 2);
+    linklist<int> *l3 = new linklist<int>;
+    cout << "Merged link list is:\n";
+    l3 = l1->merge(l2);
+    l1->print();
+    l2->print();
+    l3->print();
+    delete l1;
+    delete l2;
+    delete l3;
+
+    // 4
+    linklist<int> *l4 = new linklist<int>;
+    for (int i = 0; i < 10; i++)
+        l4->insert_at_back(1);
+    l4->insert_at_back(2);
+    l4->insert_at_back(2);
+    l4->insert_at_back(3);
+    l4->insert_at_back(4);
+    l4->insert_at_back(3);
+    l4->print();
+    cout << "Compress LinkList is:\n";
+    l4->comprees();
+    l4->print();
+    delete l4;
+    return 0;
+}
