@@ -1,0 +1,92 @@
+#include <iostream>
+using namespace std;
+template <typename T>
+struct node
+{
+    T data;
+    node<T> *next;
+    node<T>(T data)
+    {
+        this->data = data;
+        this->next = NULL;
+    }
+    template <typename U>
+    friend class linklist;
+};
+template <typename T>
+class linklist
+{
+public:
+    node<T> *head;
+    linklist()
+    {
+        this->head = NULL;
+    }
+    void insert(T data)
+    {
+        node<T> *new_node = new node<T>(data);
+
+        if (this->head == NULL)
+        {
+            this->head = new_node;
+            new_node->next = this->head;
+            return;
+        }
+        node<T> *temp = this->head;
+        while (temp->next != this->head)
+        {
+            temp = temp->next;
+        }
+        temp->next = new_node;
+        new_node->next = this->head;
+    }
+    void print()
+    {
+
+        node<T> *temp = this->head;
+        do
+        {
+            cout << temp->data << "->";
+            temp = temp->next;
+        } while (temp != this->head);
+        cout << this->head->data << endl;
+    }
+    void createLL(T arr[], int size)
+    {
+        if (head != NULL)
+        {
+            while (head->next != NULL)
+            {
+                node<T> *temp = head;
+                head = head->next;
+                delete head;
+            }
+            head = NULL;
+        }
+        for (int i = 0; i < size; i++)
+            this->insert(arr[i]);
+    }
+    ~linklist()
+    {
+        node<T> *temp = this->head;
+        do
+        {
+            node<T> *d = this->head;
+            this->head = this->head->next;
+            delete d;
+        } while (this->head != temp);
+        cout << "~linklist called\n";
+    }
+};
+int main()
+{
+    // Array to be converted
+    int arr[] = {1, 2, 3, 4, 5};
+    int s = sizeof(arr) / sizeof(arr[0]);
+    linklist<int> *l = new linklist<int>;
+    l->createLL(arr, s);
+    // Display the list
+
+    l->print();
+    delete l;
+}
