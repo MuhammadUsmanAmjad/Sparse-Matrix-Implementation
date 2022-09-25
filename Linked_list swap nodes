@@ -1,0 +1,128 @@
+#include <iostream>
+using namespace std;
+template <typename T>
+struct node
+{
+    node<T> *next;
+    node<T> *prev;
+    T data;
+    node<T>()
+    {
+        this->next = NULL;
+        this->prev = NULL;
+    }
+    template <typename U>
+    friend class linklist;
+};
+template <typename T>
+class linklist
+{
+public:
+    node<T> *head;
+    linklist()
+    {
+        this->head = NULL;
+    }
+    void insert(T data)
+    {
+        node<T> *insert_node = new node<T>();
+        insert_node->data = data;
+        if (head == NULL)
+        {
+            head = insert_node;
+            return;
+        }
+        node<T> *temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = insert_node;
+        insert_node->prev = temp;
+    }
+    void print()
+    {
+        node<T> *temp = head;
+        while (temp != NULL)
+        {
+            cout << temp->data << "->";
+            temp = temp->next;
+        }
+        cout << "null" << endl;
+    }
+    void swap_nodes(T val1, T val2)
+    {
+        if (head == NULL || head->next == NULL || val1 == val2)
+        {
+            return;
+        }
+        node<T> *temp1 = NULL;
+        node<T> *temp2 = NULL;
+        bool flag1 = false;
+        bool flag2 = false;
+        node<T> *temp = head;
+        while (temp != NULL)
+        {
+            if (temp->data == val1)
+            {
+                temp1 = temp;
+                flag1 = true;
+            }
+            if (temp->data == val2)
+            {
+                temp2 = temp;
+                flag2 = true;
+            }
+            if (flag1 == true && flag2 == true)
+                break;
+            temp = temp->next;
+        }
+        if (flag1 == true && flag2 == true)
+        {
+            if (temp1 == head)
+                head = temp2;
+            else if (temp2 == head)
+                head = temp2;
+            node<T> *t;
+            t = temp1->prev;
+            temp1->prev = temp2->prev;
+            temp2->prev = t;
+            if (temp1->prev != NULL)
+                temp1->prev->next = temp1;
+            if (temp2->prev != NULL)
+                temp2->prev->next = temp2;
+            t = temp1->next;
+            temp1->next = temp2->next;
+            temp2->next = t;
+            if (temp1->next != NULL)
+                temp1->next->prev = temp1;
+            if (temp2->next != NULL)
+                temp2->next->prev = temp2;
+        }
+    }
+    ~linklist<T>()
+    {
+        while (head != NULL)
+        {
+            node<T> *temp = head;
+            head = head->next;
+            delete temp;
+        }
+        cout << "~linklist<T> Called\n";
+    }
+};
+int main()
+{
+    linklist<int> *l1 = new linklist<int>;
+    l1->insert(10);
+    l1->insert(15);
+    l1->insert(12);
+    l1->insert(13);
+    l1->insert(20);
+    l1->insert(14);
+    l1->print();
+    l1->swap_nodes(10, 20);
+    l1->print();
+    delete l1;
+    // 10->15->12->13->20->14->null
+    // 10->15->20->13->12->14->null
+    return 0;
+}
